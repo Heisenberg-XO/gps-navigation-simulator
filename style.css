@@ -1,33 +1,39 @@
-/* RESET */
+/* =========================
+   RESET & BASE
+========================= */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* PAGE BACKGROUND (Professional but colorful) */
 body {
     font-family: "Segoe UI", Arial, sans-serif;
-    background: linear-gradient(120deg, #e0f2fe, #fef3c7);
+    background: linear-gradient(135deg, #e6f0fa, #f8fafc);
     color: #1f2937;
 }
 
-/* CONTROL PANEL */
+/* =========================
+   CONTROL PANEL (TOP CARD)
+========================= */
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 950px;
     margin: 30px auto;
     background: #ffffff;
     padding: 25px 30px;
     border-radius: 12px;
     border-left: 6px solid #2563eb;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* HEADINGS */
+/* =========================
+   HEADINGS
+========================= */
 .container h1 {
     text-align: center;
     font-size: 24px;
+    margin-bottom: 6px;
 }
 
 .container p {
@@ -37,7 +43,9 @@ body {
     margin-bottom: 20px;
 }
 
-/* FORM */
+/* =========================
+   FORM LAYOUT
+========================= */
 .form {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -48,15 +56,25 @@ body {
     grid-column: span 2;
     font-size: 14px;
     font-weight: 600;
+    color: #374151;
 }
 
 .form input {
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #cbd5e1;
+    font-size: 14px;
+    transition: border 0.2s;
 }
 
-/* BUTTONS */
+.form input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+/* =========================
+   BUTTONS
+========================= */
 .form button {
     grid-column: span 2;
     padding: 11px;
@@ -66,33 +84,68 @@ body {
     font-size: 14px;
     border-radius: 6px;
     cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
 }
 
 .form button:hover {
     background: #1e40af;
 }
 
-/* OUTPUT */
-.output {
-    margin-top: 14px;
-    padding: 12px;
-    background: #f1f5f9;
-    border-radius: 6px;
-    font-size: 14px;
+.form button:active {
+    transform: scale(0.98);
 }
 
-/* MAP */
+/* =========================
+   OUTPUT PANEL
+========================= */
+.output {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f1f5f9;
+    border-left: 4px solid #2563eb;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #111827;
+}
+
+/* =========================
+   MAP SECTION
+========================= */
 #map {
     width: 100%;
     height: 520px;
     margin: 25px auto;
     border-radius: 12px;
     border: 2px solid #cbd5e1;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* MOBILE */
+/* =========================
+   MAP POPUPS
+========================= */
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
 @media (max-width: 768px) {
+    .container {
+        margin: 15px;
+        padding: 20px;
+    }
+
     .form {
         grid-template-columns: 1fr;
+    }
+
+    .form button {
+        grid-column: span 1;
+    }
+
+    #map {
+        height: 400px;
     }
 }
