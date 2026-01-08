@@ -2,38 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bangalore GPS Navigation & Live Tracking</title>
+    <title>Bangalore GPS Navigation System</title>
 
     <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css">
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-    <h1>Bangalore GPS Navigation System</h1>
-    <p>Shortest Path & Live Phone Tracking</p>
+    <h2>Bangalore GPS Navigation System</h2>
+    <p>Routing, Live Tracking & Traffic Visualization</p>
 
-    <div class="form">
-        <label>Start Location</label>
-        <input type="text" id="start" placeholder="Eg: REVA University">
+    <label>Start Location</label>
+    <input type="text" id="start" placeholder="Hebbal">
 
-        <label>Destination</label>
-        <input type="text" id="end" placeholder="Eg: Vaddarapalya">
+    <label>Destination</label>
+    <input type="text" id="end" placeholder="Hennur">
 
-        <button onclick="findRoute()">Find Shortest Route (Dijkstra)</button>
-        <button onclick="findRouteBFS()">Find Route (BFS)</button>
-        <button onclick="startLiveTracking()">Send My Phone Location</button>
-    </div>
+    <button onclick="findRoute()">Find Route</button>
+    <button onclick="startLiveTracking()">Send My Phone Location</button>
 
     <div class="output" id="output"></div>
 </div>
 
+<!-- MAP -->
 <div id="map"></div>
 
-<!-- Leaflet -->
+<!-- JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
