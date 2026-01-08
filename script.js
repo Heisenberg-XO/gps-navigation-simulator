@@ -1,52 +1,100 @@
-// Location coordinates (Bangalore)
+/*************** FIREBASE CONFIG ***************/
+var firebaseConfig = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_AUTH_DOMAIN",
+  databaseURL: "PASTE_DATABASE_URL",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_STORAGE_BUCKET",
+  messagingSenderId: "PASTE_SENDER_ID",
+  appId: "PASTE_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+/*************** LOCATIONS (EXTENDED) ***************/
 const locations = {
+    // NORTH / NORTH-EAST
     "Hebbal": [13.0358, 77.5970],
+    "Hennur": [13.0352, 77.6400],
+    "Bagalur": [13.1386, 77.6683],
+    "Yelahanka": [13.1007, 77.5963],
+    "Kattigenahalli": [13.1210, 77.6207],
+    "Thanisandra": [13.0478, 77.6330],
+    "Nagavara": [13.0466, 77.6255],
+    "REVA University": [13.1163, 77.6349],
+
+    // CENTRAL
     "Malleshwaram": [13.0031, 77.5640],
+    "Rajajinagar": [12.9916, 77.5554],
     "Majestic": [12.9767, 77.5713],
     "KR Market": [12.9641, 77.5776],
+
+    // EAST
+    "Indiranagar": [12.9719, 77.6412],
+    "Whitefield": [12.9698, 77.7500],
+    "Marathahalli": [12.9592, 77.6974],
+
+    // SOUTH
     "Jayanagar": [12.9250, 77.5938],
+    "JP Nagar": [12.9077, 77.5856],
     "Banashankari": [12.9255, 77.5468],
+    "Vaddarapalya": [12.8995, 77.5447],
+    "BTM Layout": [12.9166, 77.6101],
     "Silk Board": [12.9177, 77.6233],
     "Electronic City": [12.8452, 77.6600]
 };
 
-// Graph (distance in km)
+/*************** GRAPH (WEIGHTED) ***************/
 const graph = {
-    "Hebbal": {"Malleshwaram": 7},
-    "Malleshwaram": {"Hebbal": 7, "Majestic": 5},
-    "Majestic": {"Malleshwaram": 5, "KR Market": 3},
-    "KR Market": {"Majestic": 3, "Jayanagar": 6},
-    "Jayanagar": {"KR Market": 6, "Banashankari": 4},
-    "Banashankari": {"Jayanagar": 4, "Silk Board": 6},
-    "Silk Board": {"Banashankari": 6, "Electronic City": 10},
-    "Electronic City": {"Silk Board": 10}
+    "Hebbal": { "Malleshwaram": 7, "Hennur": 6, "Yelahanka": 8 },
+    "Hennur": { "Hebbal": 6, "Bagalur": 10, "Thanisandra": 5 },
+    "Bagalur": { "Hennur": 10 },
+    "Yelahanka": { "Hebbal": 8, "Kattigenahalli": 5 },
+    "Kattigenahalli": { "Yelahanka": 5, "REVA University": 3 },
+    "REVA University": { "Kattigenahalli": 3 },
+
+    "Thanisandra": { "Hennur": 5, "Nagavara": 4 },
+    "Nagavara": { "Thanisandra": 4, "Indiranagar": 8 },
+
+    "Malleshwaram": { "Hebbal": 7, "Rajajinagar": 3 },
+    "Rajajinagar": { "Malleshwaram": 3, "Majestic": 4 },
+    "Majestic": { "Rajajinagar": 4, "KR Market": 3 },
+    "KR Market": { "Majestic": 3, "Jayanagar": 6 },
+
+    "Indiranagar": { "Nagavara": 8, "Marathahalli": 6 },
+    "Marathahalli": { "Indiranagar": 6, "Whitefield": 7 },
+    "Whitefield": { "Marathahalli": 7 },
+
+    "Jayanagar": { "KR Market": 6, "JP Nagar": 3, "Banashankari": 4 },
+    "JP Nagar": { "Jayanagar": 3, "BTM Layout": 4 },
+    "Banashankari": { "Jayanagar": 4, "Vaddarapalya": 3 },
+    "Vaddarapalya": { "Banashankari": 3 },
+    "BTM Layout": { "JP Nagar": 4, "Silk Board": 3 },
+    "Silk Board": { "BTM Layout": 3, "Electronic City": 10 },
+    "Electronic City": { "Silk Board": 10 }
 };
 
-// Initialize Map (Bangalore center)
+/*************** MAP INIT ***************/
 const map = L.map('map').setView([12.9716, 77.5946], 11);
-
-// OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+    attribution: '© OpenStreetMap'
 }).addTo(map);
 
 let markers = [];
 let routeLine = null;
 
-// Dijkstra
+/*************** DIJKSTRA ***************/
 function dijkstra(start, end) {
-    let dist = {}, prev = {}, visited = [];
-    for (let node in graph) dist[node] = Infinity;
+    let dist = {}, prev = {}, visited = new Set();
+    Object.keys(graph).forEach(n => dist[n] = Infinity);
     dist[start] = 0;
 
-    while (visited.length < Object.keys(graph).length) {
-        let u = null;
-        for (let node in dist) {
-            if (!visited.includes(node) && (u === null || dist[node] < dist[u])) {
-                u = node;
-            }
-        }
-        visited.push(u);
+    while (visited.size < Object.keys(graph).length) {
+        let u = Object.keys(dist).filter(n => !visited.has(n))
+            .reduce((a, b) => dist[a] < dist[b] ? a : b);
+
+        visited.add(u);
+        if (!graph[u]) break;
 
         for (let v in graph[u]) {
             let alt = dist[u] + graph[u][v];
@@ -65,82 +113,88 @@ function dijkstra(start, end) {
     return { path, distance: dist[path[path.length - 1]] };
 }
 
+/*************** BFS (EXTRA ALGORITHM) ***************/
+function bfs(start, end) {
+    let queue = [[start]];
+    let visited = new Set([start]);
+
+    while (queue.length) {
+        let path = queue.shift();
+        let node = path[path.length - 1];
+
+        if (node === end) return path;
+
+        for (let n in graph[node]) {
+            if (!visited.has(n)) {
+                visited.add(n);
+                queue.push([...path, n]);
+            }
+        }
+    }
+    return [];
+}
+
+/*************** ROUTING ***************/
 function clearMap() {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
     if (routeLine) map.removeLayer(routeLine);
 }
 
-function findRoute() {
+function drawRoute(path, distanceText) {
     clearMap();
 
-    let start = document.getElementById("start").value.trim();
-    let end = document.getElementById("end").value.trim();
-
-    if (!(start in graph) || !(end in graph)) {
-        document.getElementById("output").innerHTML = "❌ Invalid Location";
-        return;
-    }
-
-    let result = dijkstra(start, end);
-
-    // Markers
-    result.path.forEach(loc => {
-        let marker = L.marker(locations[loc]).addTo(map).bindPopup(loc);
-        markers.push(marker);
+    path.forEach(loc => {
+        markers.push(L.marker(locations[loc]).addTo(map).bindPopup(loc));
     });
 
-    // Draw route
-    let waypoints = result.path.map(loc =>
-    L.latLng(locations[loc][0], locations[loc][1])
-);
+    let waypoints = path.map(loc => L.latLng(...locations[loc]));
+    routeLine = L.Routing.control({
+        waypoints,
+        addWaypoints: false,
+        draggableWaypoints: false,
+        show: false,
+        lineOptions: { styles: [{ color: 'blue', weight: 6 }] }
+    }).addTo(map);
 
-routeLine = L.Routing.control({
-    waypoints: waypoints,
-    routeWhileDragging: false,
-    addWaypoints: false,
-    draggableWaypoints: false,
-    show: false,
-    lineOptions: {
-        styles: [{ color: 'blue', weight: 6 }]
-    }
-}).addTo(map);
-
-    document.getElementById("output").innerHTML =
-        `<b>Shortest Route:</b><br>${result.path.join(" → ")}<br><br>
-         <b>Total Distance:</b> ${result.distance} km`;
+    document.getElementById("output").innerHTML = distanceText;
 }
-// Live tracking marker
-let liveMarker = null;
 
-// Track phone location
+function findRoute() {
+    let s = start.value.trim();
+    let e = end.value.trim();
+    let r = dijkstra(s, e);
+    drawRoute(r.path, `<b>Dijkstra Path:</b><br>${r.path.join(" → ")}<br><b>Distance:</b> ${r.distance} km`);
+}
+
+function findRouteBFS() {
+    let s = start.value.trim();
+    let e = end.value.trim();
+    let p = bfs(s, e);
+    drawRoute(p, `<b>BFS Path:</b><br>${p.join(" → ")}`);
+}
+
+/*************** LIVE TRACKING ***************/
 function startLiveTracking() {
-    if (!navigator.geolocation) {
-        alert("Geolocation not supported");
-        return;
-    }
-
-    navigator.geolocation.watchPosition(
-        pos => {
-            let lat = pos.coords.latitude;
-            let lng = pos.coords.longitude;
-
-            if (!liveMarker) {
-                liveMarker = L.marker([lat, lng])
-                    .addTo(map)
-                    .bindPopup("📍 Live Device Location")
-                    .openPopup();
-            } else {
-                liveMarker.setLatLng([lat, lng]);
-            }
-
-            map.setView([lat, lng], 14);
-        },
-        err => {
-            alert("Location permission denied");
-        },
-        {
-            enableHighAccuracy: true
-        }
-    );
+    navigator.geolocation.watchPosition(pos => {
+        database.ref("devices/phone1").set({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            time: Date.now()
+        });
+    }, () => alert("Location denied"), { enableHighAccuracy: true });
 }
+
+let trackedMarker = null;
+database.ref("devices/phone1").on("value", snap => {
+    let d = snap.val();
+    if (!d) return;
+
+    let ll = [d.lat, d.lng];
+    if (!trackedMarker) {
+        trackedMarker = L.marker(ll).addTo(map).bindPopup("📍 Tracked Phone");
+    } else {
+        trackedMarker.setLatLng(ll);
+    }
+    map.setView(ll, 14);
+});
