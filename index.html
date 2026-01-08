@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bangalore GPS Navigation System</title>
+    <title>GPS Navigation & Live Tracking</title>
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
@@ -12,23 +12,28 @@
 </head>
 <body>
 
-<div class="container">
-    <h2>Bangalore GPS Navigation System</h2>
-    <p>Routing, Live Tracking & Traffic Visualization</p>
+<div class="panel">
+    <h2>GPS Navigation System</h2>
 
-    <label>Start Location</label>
-    <input type="text" id="start" placeholder="Hebbal">
+    <label>From</label>
+    <input type="text" id="from" placeholder="Hebbal">
 
-    <label>Destination</label>
-    <input type="text" id="end" placeholder="Hennur">
+    <label>To</label>
+    <input type="text" id="to" placeholder="Hennur">
 
-    <button onclick="findRoute()">Find Route</button>
-    <button onclick="startLiveTracking()">Send My Phone Location</button>
+    <button onclick="findRoute()">Show Route</button>
 
-    <div class="output" id="output"></div>
+    <hr>
+
+    <h3>Live Tracking</h3>
+
+    <label>Tracking Code</label>
+    <input type="text" id="code" placeholder="Enter any code">
+
+    <button onclick="shareLocation()">Share My Location</button>
+    <button onclick="watchLocation()">Track This Code</button>
 </div>
 
-<!-- MAP -->
 <div id="map"></div>
 
 <!-- JS -->
