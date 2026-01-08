@@ -8,6 +8,7 @@ var firebaseConfig = {
   messagingSenderId: "PASTE_SENDER_ID",
   appId: "PASTE_APP_ID"
 };
+
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
@@ -75,13 +76,14 @@ const graph = {
 };
 
 /*************** MAP INIT ***************/
-const map = L.map('map').setView([12.9716, 77.5946], 11);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
+const map = L.map("map").setView([12.9716, 77.5946], 11);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
 }).addTo(map);
 
-let markers = [];
 let routeLine = null;
+let markers = [];
 
 /*************** DIJKSTRA ***************/
 function dijkstra(start, end) {
@@ -90,11 +92,11 @@ function dijkstra(start, end) {
     dist[start] = 0;
 
     while (visited.size < Object.keys(graph).length) {
-        let u = Object.keys(dist).filter(n => !visited.has(n))
+        let u = Object.keys(dist)
+            .filter(n => !visited.has(n))
             .reduce((a, b) => dist[a] < dist[b] ? a : b);
 
         visited.add(u);
-        if (!graph[u]) break;
 
         for (let v in graph[u]) {
             let alt = dist[u] + graph[u][v];
@@ -134,47 +136,47 @@ function bfs(start, end) {
     return [];
 }
 
-/*************** ROUTING ***************/
+/*************** ROUTE DRAWING ***************/
 function clearMap() {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
     if (routeLine) map.removeLayer(routeLine);
 }
 
-function drawRoute(path, distanceText) {
+function drawRoute(path, text) {
     clearMap();
 
     path.forEach(loc => {
         markers.push(L.marker(locations[loc]).addTo(map).bindPopup(loc));
     });
 
-    let waypoints = path.map(loc => L.latLng(...locations[loc]));
+    let waypoints = path.map(p => L.latLng(...locations[p]));
     routeLine = L.Routing.control({
         waypoints,
         addWaypoints: false,
         draggableWaypoints: false,
         show: false,
-        lineOptions: { styles: [{ color: 'blue', weight: 6 }] }
+        lineOptions: { styles: [{ color: "blue", weight: 6 }] }
     }).addTo(map);
 
-    document.getElementById("output").innerHTML = distanceText;
+    document.getElementById("output").innerHTML = text;
 }
 
 function findRoute() {
     let s = start.value.trim();
     let e = end.value.trim();
     let r = dijkstra(s, e);
-    drawRoute(r.path, `<b>Dijkstra Path:</b><br>${r.path.join(" → ")}<br><b>Distance:</b> ${r.distance} km`);
+    drawRoute(r.path, `<b>Dijkstra:</b><br>${r.path.join(" → ")}<br>Distance: ${r.distance} km`);
 }
 
 function findRouteBFS() {
     let s = start.value.trim();
     let e = end.value.trim();
     let p = bfs(s, e);
-    drawRoute(p, `<b>BFS Path:</b><br>${p.join(" → ")}`);
+    drawRoute(p, `<b>BFS:</b><br>${p.join(" → ")}`);
 }
 
-/*************** LIVE TRACKING ***************/
+/*************** LIVE PHONE TRACKING ***************/
 function startLiveTracking() {
     navigator.geolocation.watchPosition(pos => {
         database.ref("devices/phone1").set({
@@ -197,4 +199,47 @@ database.ref("devices/phone1").on("value", snap => {
         trackedMarker.setLatLng(ll);
     }
     map.setView(ll, 14);
+});
+
+/*************** ARROW KEYS MOVE MAP ***************/
+document.addEventListener("keydown", e => {
+    const step = 0.002;
+    let c = map.getCenter();
+
+    if (e.key === "ArrowUp") c.lat += step;
+    if (e.key === "ArrowDown") c.lat -= step;
+    if (e.key === "ArrowLeft") c.lng -= step;
+    if (e.key === "ArrowRight") c.lng += step;
+
+    map.panTo(c);
+});
+
+/*************** TRAFFIC SIGNALS ***************/
+[
+    [12.9767, 77.5713, "Majestic Signal"],
+    [12.9177, 77.6233, "Silk Board Signal"],
+    [12.9250, 77.5938, "Jayanagar Signal"],
+    [13.0358, 77.5970, "Hebbal Signal"]
+].forEach(s => {
+    L.circleMarker([s[0], s[1]], {
+        radius: 6,
+        color: "red",
+        fillColor: "yellow",
+        fillOpacity: 1
+    }).addTo(map).bindPopup("🚦 " + s[2]);
+});
+
+/*************** PEAK TRAFFIC ZONES ***************/
+[
+    [12.9177, 77.6233],
+    [12.9767, 77.5713],
+    [12.9719, 77.6412],
+    [13.0466, 77.6255]
+].forEach(z => {
+    L.circle(z, {
+        radius: 800,
+        color: "red",
+        fillColor: "red",
+        fillOpacity: 0.25
+    }).addTo(map).bindPopup("🚗 Peak Traffic Zone");
 });
