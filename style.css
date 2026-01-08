@@ -1,151 +1,68 @@
-/* =========================
-   RESET & BASE
-========================= */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
 body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: linear-gradient(135deg, #e6f0fa, #f8fafc);
-    color: #1f2937;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    color: #222;
 }
 
-/* =========================
-   CONTROL PANEL (TOP CARD)
-========================= */
 .container {
-    width: 100%;
-    max-width: 950px;
-    margin: 30px auto;
+    width: 380px;
     background: #ffffff;
-    padding: 25px 30px;
-    border-radius: 12px;
-    border-left: 6px solid #2563eb;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    padding: 20px;
+    margin: 25px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* =========================
-   HEADINGS
-========================= */
-.container h1 {
+h2 {
     text-align: center;
-    font-size: 24px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
-.container p {
+p {
     text-align: center;
     font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 20px;
+    color: #555;
+    margin-bottom: 15px;
 }
 
-/* =========================
-   FORM LAYOUT
-========================= */
-.form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.form label {
-    grid-column: span 2;
+label {
     font-size: 14px;
     font-weight: 600;
-    color: #374151;
 }
 
-.form input {
-    padding: 10px;
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 12px 0;
     border-radius: 6px;
-    border: 1px solid #cbd5e1;
-    font-size: 14px;
-    transition: border 0.2s;
+    border: 1px solid #ccc;
 }
 
-.form input:focus {
-    outline: none;
-    border-color: #2563eb;
-}
-
-/* =========================
-   BUTTONS
-========================= */
-.form button {
-    grid-column: span 2;
-    padding: 11px;
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
     background: #2563eb;
-    border: none;
     color: white;
-    font-size: 14px;
+    border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
 }
 
-.form button:hover {
+button:hover {
     background: #1e40af;
 }
 
-.form button:active {
-    transform: scale(0.98);
-}
-
-/* =========================
-   OUTPUT PANEL
-========================= */
 .output {
-    margin-top: 15px;
-    padding: 12px;
-    background: #f1f5f9;
-    border-left: 4px solid #2563eb;
-    border-radius: 6px;
+    margin-top: 12px;
     font-size: 14px;
-    color: #111827;
 }
 
-/* =========================
-   MAP SECTION
-========================= */
 #map {
-    width: 100%;
-    height: 520px;
-    margin: 25px auto;
-    border-radius: 12px;
-    border: 2px solid #cbd5e1;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* =========================
-   MAP POPUPS
-========================= */
-.leaflet-popup-content-wrapper {
-    border-radius: 8px;
-    font-size: 13px;
-}
-
-/* =========================
-   MOBILE RESPONSIVE
-========================= */
-@media (max-width: 768px) {
-    .container {
-        margin: 15px;
-        padding: 20px;
-    }
-
-    .form {
-        grid-template-columns: 1fr;
-    }
-
-    .form button {
-        grid-column: span 1;
-    }
-
-    #map {
-        height: 400px;
-    }
+    width: 95%;
+    height: 500px;
+    margin: 20px auto 30px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
